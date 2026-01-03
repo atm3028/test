@@ -1,0 +1,72 @@
+import streamlit as st
+import datetime
+import pandas as pd
+
+# 設定網頁標題與圖示
+st.set_page_config(page_title="2026 教甄衝刺 App", page_icon="🎓")
+
+# --- 資料定義 ---
+target_date = datetime.date(2026, 4, 6)
+start_date = datetime.date(2026, 1, 4)
+today = datetime.date.today()
+days_left = (target_date - today).days
+
+# 每週任務資料庫
+weekly_tasks = {
+    "1月 (實習期)": [
+        "專書 Ch1-6 + 特教法本文",
+        "專書 Ch7-12 + 施行細則/鑑定標準",
+        "收集教學檔案照片素材",
+        "設計三折頁初步架構"
+    ],
+    "2月 (全職期)": [
+        "專書 Ch13-19 (完結)",
+        "國中考古題 (25份) 每日1份",
+        "製作萬用教具 (2/5)",
+        "完成教學檔案初稿"
+    ],
+    "3月 (衝刺期)": [
+        "高中考古題 (40份) 每日1.5份",
+        "製作萬用教具 (5/5) 完工",
+        "個人三折頁定稿與印製",
+        "法規考點最後掃描"
+    ]
+}
+
+# --- 網頁介面 ---
+st.title("🎓 2026 特教教甄倒數追蹤")
+
+# 1. 倒數計時區塊
+col1, col2 = st.columns(2)
+with col1:
+    st.metric("剩餘天數", f"{max(0, days_left)} 天")
+with col2:
+    progress = min(100, max(0, int(( (today - start_date).days / (target_date - start_date).days ) * 100)))
+    st.write(f"總計畫進度: {progress}%")
+    st.progress(progress)
+
+st.divider()
+
+# 2. 目前身分提醒
+if today < datetime.date(2026, 2, 1):
+    st.info("💡 目前身分：**實習生 (每日2小時)**\n\n重點：穩定累積法規基礎，別跟別人比題量。")
+else:
+    st.warning("🔥 目前身分：**全職考生 (每日6小時)**\n\n重點：大量刷題、檢討錯題、完成教具。")
+
+# 3. 互動式進度表
+st.subheader("📅 核心任務追蹤")
+for phase, tasks in weekly_tasks.items():
+    with st.expander(phase, expanded=(phase in ["1月 (實習期)"] if today < datetime.date(2026, 2, 1) else True)):
+        for task in tasks:
+            st.checkbox(task, key=task)
+
+# 4. 讀書會提醒
+st.divider()
+st.subheader("🤝 每週二讀書會")
+st.write("別忘了整理本週的**法規難點**與大家討論！")
+
+# 5. 快速連結 (可自行更換為你的雲端資料夾網址)
+st.sidebar.title("快速連結")
+st.sidebar.button("全國法規資料庫")
+st.sidebar.button("阿摩線上測驗")
+st.sidebar.info("加油！只要穩定執行，4/6 就是你金榜題名的日子！")
